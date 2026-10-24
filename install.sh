@@ -2,8 +2,8 @@
 # project-kb 安装器：用户级（默认）或项目级（-l）。
 set -euo pipefail
 
-# 云端仓库地址（git clone 用）。留空则必须用 -r 或 PROJECT_KB_REPO 提供。
-DEFAULT_REPO="${PROJECT_KB_REPO:-}"
+# 云端仓库地址（git clone 用）。可用 -r 或 PROJECT_KB_REPO 覆盖。
+DEFAULT_REPO="${PROJECT_KB_REPO:-https://gitee.com/samuelhg/kb-skill.git}"
 
 MODE=user
 DEST=""
@@ -23,8 +23,8 @@ usage() {
   -h, --help         显示帮助
 
 示例:
-  curl -fsSL <raw>/install.sh | bash -s -- -r <repo-url>
-  curl -fsSL <raw>/install.sh | bash -s -- -r <repo-url> -l
+  curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash
+  curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash -s -- -l
   bash install.sh -s /path/to/project-kb -l -d /path/to/project
 EOF
 }

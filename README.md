@@ -21,28 +21,33 @@ docs/kb/
 
 ## 安装
 
-要求：`bash`、`git`、`curl`。把下文 `<repo>` 换成仓库 clone 地址，`<raw>` 换成对应 raw 地址。
+要求：`bash`、`git`、`curl`。仓库地址 `https://gitee.com/samuelhg/kb-skill.git` 已内置为默认值，fork 或私有仓库用 `-r` 覆盖。
 
 ### 命令行安装
 
 ```bash
 # 用户级：所有项目可用（~/.claude/skills/project-kb）
-curl -fsSL <raw>/install.sh | bash -s -- -r <repo>
+curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash
 
 # 项目级：只对当前项目生效（<项目>/.claude/skills/project-kb）
-curl -fsSL <raw>/install.sh | bash -s -- -r <repo> -l
+curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash -s -- -l
 
 # 指定项目根 / 覆盖已有安装
-curl -fsSL <raw>/install.sh | bash -s -- -r <repo> -l -d /path/to/project -f
+curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash -s -- -l -d /path/to/project -f
 ```
 
-也可以先 clone 再本地安装：`bash install.sh -s /path/to/project-kb -l`。
+也可以先 clone 再本地安装：
+
+```bash
+git clone https://gitee.com/samuelhg/kb-skill.git /tmp/kb-skill
+bash /tmp/kb-skill/install.sh -s /tmp/kb-skill -l
+```
 
 ### Agent 会话安装
 
 在 Claude Code 里直接说：
 
-> 把 `<repo>` 安装为 project-kb 技能，项目级（或用户级）
+> 把 `https://gitee.com/samuelhg/kb-skill.git` 安装为 project-kb 技能，项目级（或用户级）
 
 agent 会调用 `install.sh` 完成同样的安装。已安装后，在新项目里说 **「初始化知识库」** 即可铺库。
 
