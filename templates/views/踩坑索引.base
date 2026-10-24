@@ -1,0 +1,13 @@
+filters:
+  and:
+    - type == "lesson"
+views:
+  - type: table
+    name: 踩坑索引
+    order:
+      - file.name
+      - tags
+      - updated
+    sort:
+      - property: updated
+        direction: DESC

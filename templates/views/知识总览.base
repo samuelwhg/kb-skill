@@ -1,0 +1,12 @@
+views:
+  - type: table
+    name: 知识总览
+    order:
+      - file.name
+      - type
+      - updated
+    sort:
+      - property: updated
+        direction: DESC
+    columnSize:
+      file.name: 215
