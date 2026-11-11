@@ -11,7 +11,7 @@ updated: {{DATE}}
 ## 1. 库结构（固定约定）
 
 ```
-docs/kb/
+docs/
 ├── CLAUDE.md        本文件（Schema）
 ├── index.md         Query 唯一路由入口；Ingest 后必更新
 ├── log.md           时间线——shell 追加（勿全文读），超 60 行归档
@@ -35,15 +35,15 @@ docs/kb/
 
 **「查笔记」= Ingest + Query 复合**：先蒸馏 `note.md` 未处理条目、补记会话新坑/决策，再基于库回答；无待蒸馏条目 = 纯 Query。
 
-- **Ingest**：读素材（note.md 增量 / repo diff / git log）→ 写/更新页（冲突时旧页标注 `> ⚠️ 已由 <新资料> 修正`，不静默覆盖）→ 刷 `index.md` → **log 用 shell 追加** `printf '%s\n' '- [日期] ingest | 说明' >> docs/kb/log.md`（勿全文读再改）→ 清理 `note.md` 已落地条目。主 log 超 60 行时把 30 天前条目压缩移入 `archive/`，尾部留一行指针。
+- **Ingest**：读素材（note.md 增量 / repo diff / git log）→ 写/更新页（冲突时旧页标注 `> ⚠️ 已由 <新资料> 修正`，不静默覆盖）→ 刷 `index.md` → **log 用 shell 追加** `printf '%s\n' '- [日期] ingest | 说明' >> docs/log.md`（勿全文读再改）→ 清理 `note.md` 已落地条目。主 log 超 60 行时把 30 天前条目压缩移入 `archive/`，尾部留一行指针。
 - **Query 最小读集**：只读 `index.md` → 目标页 →（需验证时）按「来源:」回仓库查。纯查询不读本文件、`sources.md`、`log.md`。
 - **Lint**（「自检知识库」）：查跨页矛盾、过期 active plan、孤岛页、frontmatter 不合规、缺页概念、超预算/高低频混页；页数动态统计勿硬编码；结果记 log（shell 追加）。
 
 ## 4. 与仓库的对应关系
 
-- 素材层（repo docs/代码/git）**只读**；冲突裁决以 repo 为准，修本库页面。本库是知识投影，非源码镜像。
+- 素材层（repo 代码/git/其他文档）**只读**；冲突裁决以 repo 为准，修本库页面。本库是知识投影，非源码镜像。本库就在 `docs/` 内：`docs/` 下非本库的文件仍属素材层，只读。
 - Claude memory 目录 = **过渡存储**：蒸馏进本库后即清退（删文件 + `MEMORY.md` 对应行），防双源漂移。
-- 版本管理走项目自身 git；若用 Obsidian 打开，`docs/kb/.obsidian/` 不入库。
+- 版本管理走项目自身 git；若用 Obsidian 打开，`docs/.obsidian/` 不入库。
 
 ## 5. 红线
 

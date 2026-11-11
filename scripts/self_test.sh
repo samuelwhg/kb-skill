@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# init_kb.sh 自检：铺库、二次执行拒绝、不覆盖、入口幂等、无入口文件时新建。
+# init_kb.sh 自检：铺库、二次执行跳过不覆盖、已有 docs 保护、入口幂等、全局安装不铺库。
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
@@ -15,28 +15,31 @@ printf '# Demo\n' > "$PROJ/CLAUDE.md"
 
 OUT1="$(bash "$INIT" "$PROJ")"
 grep -q 'Obsidian' <<<"$OUT1" || fail "未输出 Obsidian 检测提示"
-for f in docs/kb/index.md docs/kb/log.md docs/kb/note.md docs/kb/sources.md \
-         docs/kb/CLAUDE.md docs/kb/使用说明.md; do
+for f in docs/index.md docs/log.md docs/note.md docs/sources.md \
+         docs/CLAUDE.md; do
   [[ -f "$PROJ/$f" ]] || fail "缺少 $f"
 done
-for d in wiki lessons plans views; do
-  [[ -d "$PROJ/docs/kb/$d" ]] || fail "缺少分区 $d"
+for d in wiki lessons plans views archive; do
+  [[ -d "$PROJ/docs/$d" ]] || fail "缺少分区 $d"
 done
 [[ "$(grep -cF '<!-- project-kb:begin -->' "$PROJ/CLAUDE.md")" -eq 1 ]] || fail "入口未写入或重复"
-grep -qF 'docs/kb/index.md' "$PROJ/CLAUDE.md" || fail "入口未指向 index.md"
+grep -qF 'docs/index.md' "$PROJ/CLAUDE.md" || fail "入口未指向 index.md"
 
-# 二次执行必须拒绝，且不改动已有内容
-printf 'sentinel\n' >> "$PROJ/docs/kb/index.md"
-if bash "$INIT" "$PROJ" >/dev/null 2>&1; then
-  fail "已存在的 docs/kb 未被拒绝"
-fi
-grep -qx 'sentinel' "$PROJ/docs/kb/index.md" || fail "二次执行覆盖了已有内容"
+# 二次执行必须跳过已有文件，绝不覆盖
+printf 'sentinel\n' >> "$PROJ/docs/index.md"
+bash "$INIT" "$PROJ" >/dev/null || fail "二次执行应安全跳过"
+grep -qx 'sentinel' "$PROJ/docs/index.md" || fail "二次执行覆盖了已有内容"
 [[ "$(grep -cF '<!-- project-kb:begin -->' "$PROJ/CLAUDE.md")" -eq 1 ]] || fail "二次执行重复追加入口"
 
-# 无 CLAUDE.md / AGENTS.md 的新项目应新建 CLAUDE.md
-PROJ2="$TMP/fresh"
-mkdir -p "$PROJ2"
+# 已有 docs/（含无关文档与同名 index.md）：只补缺失，绝不覆盖；无入口文件时新建 CLAUDE.md
+PROJ2="$TMP/existing-docs"
+mkdir -p "$PROJ2/docs"
+printf 'my own index\n' > "$PROJ2/docs/index.md"
+printf 'guide\n' > "$PROJ2/docs/guide.md"
 bash "$INIT" "$PROJ2" >/dev/null
+grep -qx 'my own index' "$PROJ2/docs/index.md" || fail "覆盖了用户已有的 docs/index.md"
+grep -qx 'guide' "$PROJ2/docs/guide.md" || fail "动了无关文档"
+[[ -f "$PROJ2/docs/note.md" ]] || fail "未补齐缺失文件"
 grep -qF '<!-- project-kb:begin -->' "$PROJ2/CLAUDE.md" || fail "新项目未生成入口"
 
 # 有 AGENTS.md 时应写入 AGENTS.md，而不是新建 CLAUDE.md
@@ -47,28 +50,31 @@ bash "$INIT" "$PROJ3" >/dev/null
 grep -qF '<!-- project-kb:begin -->' "$PROJ3/AGENTS.md" || fail "未写入 AGENTS.md"
 [[ ! -f "$PROJ3/CLAUDE.md" ]] || fail "有 AGENTS.md 时不应新建 CLAUDE.md"
 
-# ── install.sh ──
+# ── install.sh（仅全局安装，不创建知识库）──
 INSTALL="$(dirname "$SCRIPT_DIR")/install.sh"
 [[ -f "$INSTALL" ]] || fail "缺少 install.sh"
 
-# 用户级：隔离 HOME，源目录安装
+# 全局：隔离 HOME，源目录安装；安装不得在任何项目铺库
 HOME_FAKE="$TMP/home"
 mkdir -p "$HOME_FAKE"
-HOME="$HOME_FAKE" bash "$INSTALL" -s "$(dirname "$SCRIPT_DIR")" >/dev/null
-UKB="$HOME_FAKE/.claude/skills/project-kb"
-[[ -f "$UKB/SKILL.md" && -x "$UKB/scripts/init_kb.sh" ]] || fail "用户级安装不完整"
-[[ ! -e "$UKB/install.sh" ]] || fail "安装目标不应包含 install.sh"
+PROJ4="$TMP/bystander-proj"
+mkdir -p "$PROJ4"
+(cd "$PROJ4" && HOME="$HOME_FAKE" bash "$INSTALL" -s "$(dirname "$SCRIPT_DIR")") >/dev/null
+UKB="$HOME_FAKE/.agents/skills/project-kb"
+[[ -f "$UKB/SKILL.md" && -x "$UKB/scripts/init_kb.sh" ]] || fail "全局安装不完整"
+[[ ! -e "$UKB/install.sh" && ! -e "$UKB/README.md" && ! -e "$UKB/SETUP.md" ]] || fail "安装目标不应包含 install.sh/README.md/SETUP.md"
+[[ ! -e "$PROJ4/docs" && ! -e "$PROJ4/CLAUDE.md" ]] || fail "全局安装不应创建知识库或入口"
 if HOME="$HOME_FAKE" bash "$INSTALL" -s "$(dirname "$SCRIPT_DIR")" >/dev/null 2>&1; then
   fail "目标已存在时未拒绝"
 fi
 HOME="$HOME_FAKE" bash "$INSTALL" -s "$(dirname "$SCRIPT_DIR")" -f >/dev/null || fail "-f 覆盖失败"
+if HOME="$HOME_FAKE" bash "$INSTALL" -l >/dev/null 2>&1; then
+  fail "项目级 -l 已移除，应报未知参数"
+fi
 
-# 项目级：不带 -s，靠脚本所在目录自动识别源
-PROJ4="$TMP/install-proj"
-mkdir -p "$PROJ4"
-bash "$INSTALL" -l -d "$PROJ4" >/dev/null
-[[ -f "$PROJ4/.claude/skills/project-kb/SKILL.md" ]] || fail "项目级安装不完整"
-bash "$PROJ4/.claude/skills/project-kb/scripts/init_kb.sh" "$PROJ4" >/dev/null
-[[ -f "$PROJ4/docs/kb/index.md" ]] || fail "安装后的技能无法初始化知识库"
+# 各项目自行决定建库：用安装后的技能铺库
+bash "$UKB/scripts/init_kb.sh" "$PROJ4" >/dev/null
+[[ -f "$PROJ4/docs/index.md" && -f "$PROJ4/docs/note.md" ]] || fail "安装后的技能无法初始化知识库"
+grep -qF '<!-- project-kb:begin -->' "$PROJ4/CLAUDE.md" || fail "建库未写入入口"
 
 echo "PASS: project-kb init + install 自检通过"

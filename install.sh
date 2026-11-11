@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
-# project-kb 安装器：用户级（默认）或项目级（-l）。
+# project-kb 安装器：全局安装到 ~/.agents/skills/project-kb。
+# 只装技能，不创建知识库；各项目自行决定是否「创建知识库」。
 set -euo pipefail
 
 # 云端仓库地址（git clone 用）。可用 -r 或 PROJECT_KB_REPO 覆盖。
 DEFAULT_REPO="${PROJECT_KB_REPO:-https://gitee.com/samuelhg/kb-skill.git}"
 
-MODE=user
-DEST=""
 REPO="$DEFAULT_REPO"
 SRC=""
 FORCE=0
@@ -15,8 +14,8 @@ usage() {
   cat <<'EOF'
 用法: install.sh [选项]
 
-  -l, --local        安装到项目级 <项目>/.claude/skills/project-kb（默认用户级 ~/.claude/skills）
-  -d, --dir DIR      项目根目录（配合 -l，默认当前目录）
+全局安装到 ~/.agents/skills/project-kb，所有项目可用；不创建知识库。
+
   -r, --repo URL     云端仓库地址（默认取 PROJECT_KB_REPO 环境变量）
   -s, --source DIR   从本地目录安装，跳过 clone（开发/离线用）
   -f, --force        目标已存在时覆盖
@@ -24,8 +23,7 @@ usage() {
 
 示例:
   curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash
-  curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash -s -- -l
-  bash install.sh -s /path/to/project-kb -l -d /path/to/project
+  bash install.sh -s /path/to/kb-skill -f
 EOF
 }
 
@@ -33,8 +31,6 @@ die() { echo "错误: $*" >&2; exit 1; }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -l|--local) MODE=local; shift ;;
-    -d|--dir) [[ $# -ge 2 ]] || die "$1 需要参数"; DEST="$2"; shift 2 ;;
     -r|--repo) [[ $# -ge 2 ]] || die "$1 需要参数"; REPO="$2"; shift 2 ;;
     -s|--source) [[ $# -ge 2 ]] || die "$1 需要参数"; SRC="$2"; shift 2 ;;
     -f|--force) FORCE=1; shift ;;
@@ -62,17 +58,7 @@ if [[ -z "$SRC" ]]; then
 fi
 [[ -f "$SRC/SKILL.md" && -f "$SRC/scripts/init_kb.sh" && -d "$SRC/templates" ]] || die "源目录不完整: $SRC"
 
-# 目标位置
-if [[ "$MODE" == local ]]; then
-  ROOT="${DEST:-$PWD}"
-  [[ -d "$ROOT" ]] || die "项目目录不存在: $ROOT"
-  ROOT="$(cd "$ROOT" && pwd)"
-  TARGET="$ROOT/.claude/skills/project-kb"
-else
-  [[ -z "$DEST" ]] || die "-d 仅用于 -l 项目级安装"
-  TARGET="$HOME/.claude/skills/project-kb"
-fi
-
+TARGET="$HOME/.agents/skills/project-kb"
 if [[ -e "$TARGET" || -L "$TARGET" ]]; then
   [[ "$FORCE" -eq 1 ]] || die "$TARGET 已存在；加 -f 覆盖"
   rm -rf "$TARGET"
@@ -80,12 +66,8 @@ fi
 
 mkdir -p "$(dirname "$TARGET")"
 cp -R "$SRC" "$TARGET"
-rm -rf "$TARGET/.git" "$TARGET/install.sh" "$TARGET/README.md"
+rm -rf "$TARGET/.git" "$TARGET/install.sh" "$TARGET/README.md" "$TARGET/SETUP.md"
 chmod +x "$TARGET/scripts/"*.sh
 
-echo "已安装 project-kb ($MODE): $TARGET"
-if [[ "$MODE" == local ]]; then
-  echo "项目内使用：在新会话里说「初始化知识库」，或运行 $TARGET/scripts/init_kb.sh ."
-else
-  echo "新会话生效；任意项目可说「初始化知识库」"
-fi
+echo "已全局安装 project-kb: $TARGET"
+echo "新会话生效；各项目自行决定是否建库：在项目里说「创建知识库」，或运行 $TARGET/scripts/init_kb.sh <项目根>"
