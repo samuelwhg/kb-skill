@@ -6,13 +6,13 @@ updated: {{DATE}}
 
 # Schema — 本库维护契约（LLM 必读）
 
-> 项目根 `CLAUDE.md` 已登记本库入口；本文件是维护细节的唯一权威。纯 Query 无需读本文件。
+> 项目根 `AGENTS.md` 已登记本库入口；本文件是维护细节的唯一权威。纯 Query 无需读本文件。
 
 ## 1. 库结构（固定约定）
 
 ```
 docs/
-├── CLAUDE.md        本文件（Schema）
+├── AGENTS.md        本文件（Schema）
 ├── index.md         Query 唯一路由入口；Ingest 后必更新
 ├── log.md           时间线——shell 追加（勿全文读），超 60 行归档
 ├── archive/         log 归档（log-YYYYQn.md），查询默认不读

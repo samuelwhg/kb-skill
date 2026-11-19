@@ -4,10 +4,15 @@
 
 ## 给 AI 的说明（安装入口）
 
-> **如果你是 AI agent**（Claude Code、Cursor 等），用户要求安装本技能时：
-> 1. 先读本仓库的 [SETUP.md](SETUP.md)——安装流程的唯一权威说明；
-> 2. 严格按 SETUP.md 执行，不要凭记忆拼命令、不要手工复制模板；
-> 3. 按 SETUP.md 的「验证」检查结果，再向用户汇报。
+复制下面整段发给任意 AI agent（Claude Code、Cursor 等）即可，无需先下载仓库：
+
+```text
+请为我安装 project-kb 技能（仓库：https://gitee.com/samuelhg/kb-skill）：
+1. 先在线读取 SETUP.md——安装流程的唯一权威说明：
+   https://gitee.com/samuelhg/kb-skill/raw/master/SETUP.md
+2. 严格按 SETUP.md 执行，不要凭记忆拼命令、不要手工复制模板；
+3. 按 SETUP.md 的「验证」检查结果，再向我汇报。
+```
 
 ## 安装（全局）
 
@@ -26,7 +31,7 @@ curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash
 | **查笔记** | 蒸馏 `docs/note.md` 收集箱入库，再基于库回答 |
 | **自检知识库** | Lint：跨页矛盾、过期计划、孤岛页、frontmatter |
 
-「创建」由本技能完成；「查询 / 查笔记 / 自检」由建库时写入根 `CLAUDE.md`（或 `AGENTS.md`）的入口约定驱动，建库后的任意会话都生效。日常只需把想法写进 `docs/note.md`，其余簿记（`index.md`、`log.md`）由 agent 维护。
+「创建」由本技能完成；「查询 / 查笔记 / 自检」由建库时写入根 `AGENTS.md` 的入口约定驱动，建库后的任意会话都生效。日常只需把想法写进 `docs/note.md`，其余簿记（`index.md`、`log.md`）由 agent 维护。
 
 ## 结构
 
@@ -41,7 +46,7 @@ docs/
 ├── plans/          计划页（带 status）
 ├── views/          Obsidian Bases 自动表（可选）
 ├── archive/        log 归档
-└── CLAUDE.md       维护契约：frontmatter、双链、页预算、权威页规则
+└── AGENTS.md       维护契约：frontmatter、双链、页预算、权威页规则
 ```
 
 ## 说明

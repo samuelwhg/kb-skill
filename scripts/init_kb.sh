@@ -46,11 +46,8 @@ if [[ ${#CREATED[@]} -gt 0 ]]; then
   sed -i "s|{{PROJECT}}|$(esc "$PROJECT")|g; s|{{DATE}}|$DATE|g" "${CREATED[@]}"
 fi
 
-# 根入口：优先 CLAUDE.md，其次 AGENTS.md，都没有则新建 CLAUDE.md
-ENTRY="$ROOT/CLAUDE.md"
-if [[ ! -f "$ENTRY" && -f "$ROOT/AGENTS.md" ]]; then
-  ENTRY="$ROOT/AGENTS.md"
-fi
+# 根入口：AGENTS.md，没有则新建
+ENTRY="$ROOT/AGENTS.md"
 
 MARK_BEGIN="<!-- project-kb:begin -->"
 if [[ -f "$ENTRY" ]] && grep -qF "$MARK_BEGIN" "$ENTRY"; then
@@ -61,7 +58,7 @@ else
 <!-- project-kb:begin -->
 ## 知识库
 
-本项目知识库在 `docs/`。回答「环境/命令/坑/计划/契约/历史决策」前，先读 `docs/index.md` 路由到目标页；维护契约见 `docs/CLAUDE.md`。
+本项目知识库在 `docs/`。回答「环境/命令/坑/计划/契约/历史决策」前，先读 `docs/index.md` 路由到目标页；维护契约见 `docs/AGENTS.md`。
 
 - 随手记进 `docs/note.md`；说「查笔记」= 蒸馏收集箱 + 基于库回答
 - 说「自检知识库」= Lint

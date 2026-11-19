@@ -38,12 +38,12 @@ bash /tmp/kb-skill/install.sh -s /tmp/kb-skill
 bash ~/.agents/skills/project-kb/scripts/init_kb.sh <项目根>
 ```
 
-效果：在 `<项目根>/docs/` 铺骨架——`index.md`、`note.md`、`log.md`、`sources.md`、`CLAUDE.md`（维护契约）、`wiki/`、`lessons/`、`plans/`、`views/`、`archive/`；**已存在的文件一律跳过，绝不覆盖**（`docs/` 里原有的其他文档不受影响）；并在根 `CLAUDE.md`（优先）或 `AGENTS.md` 幂等追加 `<!-- project-kb:begin -->` 知识库入口，两者都没有则新建 `CLAUDE.md`。
+效果：在 `<项目根>/docs/` 铺骨架——`index.md`、`note.md`、`log.md`、`sources.md`、`AGENTS.md`（维护契约）、`wiki/`、`lessons/`、`plans/`、`views/`、`archive/`；**已存在的文件一律跳过，绝不覆盖**（`docs/` 里原有的其他文档不受影响）；并在根 `AGENTS.md` 幂等追加 `<!-- project-kb:begin -->` 知识库入口，没有则新建。
 
 ## 验证
 
 - `~/.agents/skills/project-kb` 存在且含 `SKILL.md`、`scripts/init_kb.sh`、`templates/`
-- 建库后：`<项目>/docs/` 下可见 `index.md` 与 `note.md`；根 `CLAUDE.md` 或 `AGENTS.md` 含 `project-kb:begin` 标记
+- 建库后：`<项目>/docs/` 下可见 `index.md` 与 `note.md`；根 `AGENTS.md` 含 `project-kb:begin` 标记
 - 可选全量自检：`bash scripts/self_test.sh`（在技能源目录运行）
 
 ## 给 AI 的执行约定
