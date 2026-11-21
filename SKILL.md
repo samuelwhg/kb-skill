@@ -25,7 +25,8 @@ bash ~/.agents/skills/project-kb/scripts/init_kb.sh "<项目根>"
 ```
 
 3. 把脚本输出的创建/跳过清单转述给用户，并提醒：
-   - 新想法先写 `docs/note.md`，之后说「查笔记」由 Claude 蒸馏入库
+   - `docs/note.md` 是**唯一交互面**：人随手记、跨项目留言都只写这里，说「查笔记」蒸馏入库
+   - 跨项目交叉检查发现问题时，只向对方 `docs/note.md` 追加留言（来源 + 发现 + 证据 + 建议），不改对方任何文档
    - 维护契约在 `docs/AGENTS.md`；根 `AGENTS.md` 只留入口指针
    - 如果项目使用 Obsidian，可直接把 `docs/` 作为 vault 打开；`.obsidian/` 不纳入 git
 

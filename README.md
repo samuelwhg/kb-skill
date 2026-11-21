@@ -38,7 +38,7 @@ curl -fsSL https://gitee.com/samuelhg/kb-skill/raw/master/install.sh | bash
 ```
 docs/
 ├── index.md        查询路由入口
-├── note.md         收集箱：随手记，「查笔记」蒸馏入库
+├── note.md         唯一交互面（人↔agent、项目↔项目）：随手记 + 跨项目留言，「查笔记」蒸馏
 ├── log.md          时间线（shell 追加）
 ├── sources.md      素材层登记
 ├── wiki/           知识页
