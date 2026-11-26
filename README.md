@@ -52,5 +52,6 @@ docs/
 ## 说明
 
 - `docs/` 已有文件（含同名 `index.md`）一律跳过，不覆盖任何内容
+- GitHub 镜像：<https://github.com/samuelwhg/kb-skill>；origin 配了双推送地址，`git push` 同时更新 Gitee 与 GitHub
 - 用 Obsidian 时可直接把 `docs` 作为 vault；`.obsidian/` 不纳入 git；密钥/Token 严禁入库
 - 自检：`bash scripts/self_test.sh`
